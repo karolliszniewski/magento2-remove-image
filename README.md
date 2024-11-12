@@ -63,3 +63,66 @@ Ensure that the attribute is correctly set as a required attribute if necessary,
 
 By reviewing these areas of your custom module's code, you should be able to identify the root cause of the "swatch_image attribute is not set" error and make the necessary corrections to ensure that the image deletion and product saving processes are handling the "swatch_image" attribute correctly.
 Let me know if you have any other questions or if you need further assistance in troubleshooting this issue.
+
+
+
+
+
+
+
+
+
+Okay, let's explore another approach to troubleshooting this issue with the "swatch_image" attribute in your custom Magento 2 module.
+In addition to the code-level investigation, you can also try a more diagnostic approach by analyzing the product data and the module's behavior.
+
+Check the Product Metadata:
+
+Locate the product that is causing the issue and view its detailed information, including the product attributes.
+Verify that the "swatch_image" attribute is present in the product data, even after attempting to remove the image.
+Check if the "swatch_image" attribute is being properly populated when the product image is updated or added.
+
+You can do this by:
+
+Accessing the product edit page in the Magento admin
+Inspecting the product data using a database tool or the Magento CLI
+
+
+Review the Module's Event Observers:
+
+Magento 2 uses an event-driven architecture, so your custom module might be listening to specific events related to product image management.
+Identify the event observers (event handlers) in your module that are responsible for handling product image-related events, such as:
+
+catalog_product_save_after
+catalog_product_edit_action
+catalog_product_delete_before
+
+
+Examine the code in these event observers to ensure they are properly handling the "swatch_image" attribute during the respective product operations.
+
+Example event observer:
+phpCopy// In your module's etc/events.xml
+<event name="catalog_product_save_after">
+    <observer name="your_module_product_save_after" instance="Your\Module\Observer\ProductSaveAfterObserver" />
+</event>
+
+// In Your\Module\Observer\ProductSaveAfterObserver.php
+public function execute(\Magento\Framework\Event\Observer $observer)
+{
+    $product = $observer->getEvent()->getProduct();
+    if ($product->getImage()) {
+        $product->setData('swatch_image', $product->getImage());
+    } else {
+        $product->setData('swatch_image', null);
+    }
+    $product->save();
+}
+
+Enable Magento Logging:
+
+Temporarily enable more verbose logging in Magento to capture any error messages or context related to the "swatch_image" attribute issues.
+Check the Magento log files (located in the var/log directory) for any relevant error messages or stack traces that could provide clues about the root cause of the problem.
+
+
+
+By using this diagnostic approach, you can better understand the behavior of your custom module and identify the specific areas of the code that are responsible for the "swatch_image" attribute-related issues. This can help you pinpoint the problem and make the necessary corrections.
+Let me know if you have any other questions or if you need further assistance in troubleshooting this issue.
